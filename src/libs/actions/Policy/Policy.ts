@@ -76,6 +76,7 @@ import * as TransactionUtils from '@libs/TransactionUtils';
 import type {PolicySelector} from '@pages/home/sidebar/SidebarScreen/FloatingActionButtonAndPopover';
 import * as PaymentMethods from '@userActions/PaymentMethods';
 import * as PersistedRequests from '@userActions/PersistedRequests';
+import * as ReportActions from '@userActions/Report'
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {
@@ -379,9 +380,10 @@ function deleteWorkspace(policyID: string, policyName: string) {
             },
         },
     ];
-
+    
     reportsToArchive.forEach((report) => {
         const {reportID, stateNum, statusNum, oldPolicyName} = report ?? {};
+        ReportActions.removeChatFromQuickAction(reportID!)
         failureData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,

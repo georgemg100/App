@@ -2791,6 +2791,18 @@ function leaveGroupChat(reportID: string) {
     API.write(WRITE_COMMANDS.LEAVE_GROUP_CHAT, {reportID}, {optimisticData});
 }
 
+function removeChatFromQuickAction(reportID: string) {
+    const optimisticData: OnyxUpdate[] = [];
+    if (quickAction?.chatReportID?.toString() === reportID) {
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE,
+            value: null,
+        });
+    }
+    API.write(WRITE_COMMANDS.LEAVE_GROUP_CHAT, {reportID}, {optimisticData});
+}
+
 /** Leave a report by setting the state to submitted and closed */
 function leaveRoom(reportID: string, isWorkspaceMemberLeavingWorkspaceRoom = false) {
     const report = ReportConnection.getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
@@ -4190,4 +4202,5 @@ export {
     exportToIntegration,
     markAsManuallyExported,
     handleReportChanged,
+    removeChatFromQuickAction,
 };
