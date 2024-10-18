@@ -45,6 +45,9 @@ import com.urbanairship.push.PushMessage;
 import com.urbanairship.push.notifications.NotificationArguments;
 import com.urbanairship.reactnative.ReactNotificationProvider;
 import com.urbanairship.util.ImageUtils;
+import com.urbanairship.push.notifications.NotificationResult;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -89,12 +92,27 @@ public class CustomNotificationProvider extends ReactNotificationProvider {
 
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ConcurrentHashMap<String, Notification> notificationMap = new ConcurrentHashMap<>();
 
     public CustomNotificationProvider(@NonNull Context context, @NonNull AirshipConfigOptions configOptions) {
         super(context, configOptions);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createAndRegisterNotificationChannel(context);
         }
+    }
+
+    @NonNull
+    @Override
+    public NotificationResult onCreateNotification(@NonNull Context context, @NonNull NotificationArguments arguments) {
+        NotificationResult notification = super.onCreateNotification(context, arguments);
+        String sendId = arguments.getMessage().getSendId();
+        notificationMap.put(sendId, notification.getNotification());
+        return null;
+    }
+
+    // Method to retrieve and remove the notification from the map
+    public Notification getNotification(String sendId) {
+        return notificationMap.remove(sendId);
     }
 
     @NonNull
